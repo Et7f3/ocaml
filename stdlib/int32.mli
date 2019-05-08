@@ -56,15 +56,28 @@ external mul : int32 -> int32 -> int32 = "%int32_mul"
 (** Multiplication. *)
 
 external div : int32 -> int32 -> int32 = "%int32_div"
-(** Integer division.  Raise [Division_by_zero] if the second
+(** Integer division.
+   @raise Division_by_zero if the second
    argument is zero.  This division rounds the real quotient of
    its arguments towards zero, as specified for {!Stdlib.(/)}. *)
+
+val unsigned_div : int32 -> int32 -> int32
+(** Same as {!div}, except that arguments and result are interpreted as {e
+    unsigned} 32-bit integers.
+
+    @since 4.08.0 *)
 
 external rem : int32 -> int32 -> int32 = "%int32_mod"
 (** Integer remainder.  If [y] is not zero, the result
    of [Int32.rem x y] satisfies the following property:
    [x = Int32.add (Int32.mul (Int32.div x y) y) (Int32.rem x y)].
    If [y = 0], [Int32.rem x y] raises [Division_by_zero]. *)
+
+val unsigned_rem : int32 -> int32 -> int32
+(** Same as {!rem}, except that arguments and result are interpreted as {e
+    unsigned} 32-bit integers.
+
+    @since 4.08.0 *)
 
 val succ : int32 -> int32
 (** Successor.  [Int32.succ x] is [Int32.add x Int32.one]. *)
@@ -112,7 +125,8 @@ external shift_right_logical : int32 -> int -> int32 = "%int32_lsr"
 
 external of_int : int -> int32 = "%int32_of_int"
 (** Convert the given integer (type [int]) to a 32-bit integer
-    (type [int32]). *)
+    (type [int32]). On 64-bit platforms, the argument is taken
+    modulo 2{^32}. *)
 
 external to_int : int32 -> int = "%int32_to_int"
 (** Convert the given 32-bit integer (type [int32]) to an
@@ -120,6 +134,13 @@ external to_int : int32 -> int = "%int32_to_int"
    is taken modulo 2{^31}, i.e. the high-order bit is lost
    during the conversion.  On 64-bit platforms, the conversion
    is exact. *)
+
+val unsigned_to_int : int32 -> int option
+(** Same as {!to_int}, but interprets the argument as an {e unsigned} integer.
+    Returns [None] if the unsigned value of the argument cannot fit into an
+    [int].
+
+    @since 4.08.0 *)
 
 external of_float : float -> int32
   = "caml_int32_of_float" "caml_int32_of_float_unboxed"
@@ -147,7 +168,7 @@ external of_string : string -> int32 = "caml_int32_of_string"
 
    The [_] (underscore) character can appear anywhere in the string
    and is ignored.
-   Raise [Failure "Int32.of_string"] if the given string is not
+   @raise Failure if the given string is not
    a valid representation of an integer, or if the integer represented
    exceeds the range of integers representable in type [int32]. *)
 
@@ -183,6 +204,12 @@ val compare: t -> t -> int
     {!Stdlib.compare}.  Along with the type [t], this function [compare]
     allows the module [Int32] to be passed as argument to the functors
     {!Set.Make} and {!Map.Make}. *)
+
+val unsigned_compare: t -> t -> int
+(** Same as {!compare}, except that arguments are interpreted as {e unsigned}
+    32-bit integers.
+
+    @since 4.08.0 *)
 
 val equal: t -> t -> bool
 (** The equal function for int32s.
