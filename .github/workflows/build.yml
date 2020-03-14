@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: [windows-latest]
     steps:
-      - uses: action/checkout@v1
+      - uses: actions/checkout@v1
       - run: where bash
         shell: bash
       - run: where pacman || echo Not found
