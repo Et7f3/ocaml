@@ -6,6 +6,7 @@ jobs:
   build:
     runs-on: [windows-latest]
     steps:
+      - uses: action/checkout@v1
       - run: where bash
         shell: bash
       - run: where pacman || echo Not found
@@ -14,3 +15,10 @@ jobs:
         shell: bash
       - run: where gcc || echo Not found
         shell: bash
+      - run: where make || echo Not found
+        shell: bash
+      - run: |
+         cp config/m-nt.h runtime/caml/m.h
+         cp config/s-nt.h runtime/caml/s.h
+         cp config/Makefile.mingw64 Makefile.config
+      - run: git submodule update --init
