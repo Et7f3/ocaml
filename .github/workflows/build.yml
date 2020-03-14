@@ -25,6 +25,8 @@ jobs:
         shell: bash
       - run: git submodule update --init
       - run: |
+          ./configure
           make flexdll
           make world.opt
           make flexlink.opt
+        shell: bash
