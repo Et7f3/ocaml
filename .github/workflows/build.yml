@@ -1,1 +1,11 @@
+name: Build
 
+on: [push]
+
+jobs:
+  build:
+    runs-on: [windows-latest]
+    steps:
+      - run: where bash
+      - run: where mingw-get
+      - run: where gcc
