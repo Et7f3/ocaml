@@ -21,4 +21,9 @@ jobs:
          cp config/m-nt.h runtime/caml/m.h
          cp config/s-nt.h runtime/caml/s.h
          cp config/Makefile.mingw64 Makefile.config
+        shell: bash
       - run: git submodule update --init
+      - run: |
+          make flexdll
+          make world.opt
+          make flexlink.opt
