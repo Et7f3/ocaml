@@ -19,8 +19,8 @@ jobs:
         shell: bash
       - run: git log -- config/m-nt.h
       - run: |
-         cp config/m-nt.h runtime/caml/m.h
-         cp config/s-nt.h runtime/caml/s.h
+         echo cp config/m-nt.h runtime/caml/m.h
+         echo cp config/s-nt.h runtime/caml/s.h
          cp config/Makefile.mingw64 Makefile.config
         shell: bash
       - run: git submodule update --init
