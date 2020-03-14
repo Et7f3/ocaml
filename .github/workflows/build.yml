@@ -17,7 +17,7 @@ jobs:
         shell: bash
       - run: where make || echo Not found
         shell: bash
-      - run: git log --full-history -- config/m-nt.h
+      - run: git log --full-history -1 -- config/m-nt.h
       - run: |
          cp config/m-nt.h runtime/caml/m.h
          cp config/s-nt.h runtime/caml/s.h
