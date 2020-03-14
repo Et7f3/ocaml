@@ -8,7 +8,9 @@ jobs:
     steps:
       - run: where bash
         shell: bash
-      - run: where mingw-get
+      - run: where pacman || echo Not found
         shell: bash
-      - run: where gcc
+      - run: where mingw-get || echo Not found
+        shell: bash
+      - run: where gcc || echo Not found
         shell: bash
