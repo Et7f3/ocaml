@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v1
       - run: where bash
         shell: bash
+      - run: where diff
       - run: where pacman || echo Not found
         shell: bash
       - run: where mingw-get || echo Not found
