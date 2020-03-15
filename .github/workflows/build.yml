@@ -10,6 +10,7 @@ jobs:
       - run: where bash
         shell: bash
       - run: where diff
+        shell: bash
       - run: where pacman || echo Not found
         shell: bash
       - run: where mingw-get || echo Not found
