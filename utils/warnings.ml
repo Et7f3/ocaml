@@ -57,7 +57,9 @@ type t =
   | Wildcard_arg_to_constant_constr         (* 28 *)
   | Eol_in_string                           (* 29 *)
   | Duplicate_definitions of string * string * string * string (*30 *)
+#if undefined BS_ONLY then  
   | Multiple_definition of string * string * string (* 31 *)
+#end  
   | Unused_value_declaration of string      (* 32 *)
   | Unused_open of string                   (* 33 *)
   | Unused_type_declaration of string       (* 34 *)
@@ -77,14 +79,18 @@ type t =
   | Eliminated_optional_arguments of string list (* 48 *)
   | No_cmi_file of string * string option   (* 49 *)
   | Bad_docstring of bool                   (* 50 *)
+#if undefined BS_ONLY then          
   | Expect_tailcall                         (* 51 *)
+#end  
   | Fragile_literal_pattern                 (* 52 *)
   | Misplaced_attribute of string           (* 53 *)
   | Duplicated_attribute of string          (* 54 *)
   | Inlining_impossible of string           (* 55 *)
   | Unreachable_case                        (* 56 *)
   | Ambiguous_pattern of string list        (* 57 *)
+#if undefined BS_ONLY then  
   | No_cmx_file of string                   (* 58 *)
+#end  
   | Assignment_to_non_mutable_value         (* 59 *)
   | Unused_module of string                 (* 60 *)
   | Unboxable_type_in_prim_decl of string   (* 61 *)
@@ -139,7 +145,9 @@ let number = function
   | Wildcard_arg_to_constant_constr -> 28
   | Eol_in_string -> 29
   | Duplicate_definitions _ -> 30
+#if undefined BS_ONLY then  
   | Multiple_definition _ -> 31
+#end  
   | Unused_value_declaration _ -> 32
   | Unused_open _ -> 33
   | Unused_type_declaration _ -> 34
@@ -159,14 +167,18 @@ let number = function
   | Eliminated_optional_arguments _ -> 48
   | No_cmi_file _ -> 49
   | Bad_docstring _ -> 50
+#if undefined BS_ONLY then  
   | Expect_tailcall -> 51
+#end  
   | Fragile_literal_pattern -> 52
   | Misplaced_attribute _ -> 53
   | Duplicated_attribute _ -> 54
   | Inlining_impossible _ -> 55
   | Unreachable_case -> 56
   | Ambiguous_pattern _ -> 57
+#if undefined BS_ONLY then    
   | No_cmx_file _ -> 58
+#end  
   | Assignment_to_non_mutable_value -> 59
   | Unused_module _ -> 60
   | Unboxable_type_in_prim_decl _ -> 61
@@ -244,7 +256,11 @@ let backup () = !current
 let restore x = current := x
 
 let is_active x = not !disabled && (!current).active.(number x);;
+#if true then
+let is_error = is_active
+#else
 let is_error x = not !disabled && (!current).error.(number x);;
+#end
 
 let mk_lazy f =
   let state = backup () in
@@ -408,10 +424,12 @@ let message = function
   | Duplicate_definitions (kind, cname, tc1, tc2) ->
       Printf.sprintf "the %s %s is defined in both types %s and %s."
         kind cname tc1 tc2
+#if undefined BS_ONLY then        
   | Multiple_definition(modname, file1, file2) ->
       Printf.sprintf
         "files %s and %s both define a module named %s"
         file1 file2 modname
+#end        
   | Unused_value_declaration v -> "unused value " ^ v ^ "."
   | Unused_open s -> "unused open " ^ s ^ "."
   | Unused_type_declaration s -> "unused type " ^ s ^ "."
@@ -491,8 +509,10 @@ let message = function
   | Bad_docstring unattached ->
       if unattached then "unattached documentation comment (ignored)"
       else "ambiguous documentation comment"
+#if undefined BS_ONLY then      
   | Expect_tailcall ->
       Printf.sprintf "expected tailcall"
+#end      
   | Fragile_literal_pattern ->
       Printf.sprintf
         "Code should not depend on the actual values of\n\
@@ -521,10 +541,12 @@ let message = function
         "Ambiguous or-pattern variables under guard;\n\
          %s may match different arguments. (See manual section 8.5)"
         msg
+#if undefined BS_ONLY then        
   | No_cmx_file name ->
       Printf.sprintf
         "no cmx file was found in path for module %s, \
          and its interface was not compiled with -opaque" name
+#end         
   | Assignment_to_non_mutable_value ->
       "A potential assignment to a non-mutable value was detected \n\
         in this source file.  Such assignments may generate incorrect code \n\
