@@ -262,7 +262,7 @@ let setup_colors () =
 let print_loc ppf loc =
   setup_colors ();
   let (file, line, startchar) = get_pos_info loc.loc_start in
-#if undefined BS_NO_COMPILER_PATCH then 
+#if true then 
   let startchar = 
     if Clflags.bs_vscode then startchar + 1 else startchar in 
 #end      
