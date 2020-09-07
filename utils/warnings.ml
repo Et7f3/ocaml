@@ -256,11 +256,11 @@ let backup () = !current
 let restore x = current := x
 
 let is_active x = not !disabled && (!current).active.(number x);;
-#if true then
-let is_error = is_active
-#else
-let is_error x = not !disabled && (!current).error.(number x);;
-#end
+
+let is_error = 
+  if !Config.bs_only then is_active else 
+    fun x -> not !disabled && (!current).error.(number x) 
+
 
 let mk_lazy f =
   let state = backup () in
@@ -376,15 +376,27 @@ let message = function
         ("the following methods are overridden by the class"
          :: cname  :: ":\n " :: slist)
   | Method_override [] -> assert false
+#if true then
+  | Partial_match "" ->
+      "You forgot to handle a possible case here, though we don't have more information on the value."
+  | Partial_match s ->
+      "You forgot to handle a possible case here, for example: \n  " ^ s
+#else  
   | Partial_match "" -> "this pattern-matching is not exhaustive."
   | Partial_match s ->
       "this pattern-matching is not exhaustive.\n\
        Here is an example of a case that is not matched:\n" ^ s
+#end       
   | Non_closed_record_pattern s ->
       "the following labels are not bound in this record pattern:\n" ^ s ^
       "\nEither bind these labels explicitly or add '; _' to the pattern."
+#if true then      
+  | Statement_type -> 
+    "This expression returns a value, but you're not doing anything with it. If this is on purpose, wrap it with `ignore`."      
+#else    
   | Statement_type ->
       "this expression should have type unit."
+#end      
   | Unused_match -> "this match case is unused."
   | Unused_pat   -> "this sub-pattern is unused."
   | Instance_variable_override [lab] ->
@@ -400,7 +412,17 @@ let message = function
   | Implicit_public_methods l ->
       "the following private methods were made public implicitly:\n "
       ^ String.concat " " l ^ "."
+#if true then
+  | Unerasable_optional_argument ->
+      String.concat ""
+        ["This optional parameter in final position will, in practice, not be optional.\n";
+         "  Reorder the parameters so that at least one non-optional one is in final position or, if all parameters are optional, insert a final ().\n\n";
+         "  Explanation: If the final parameter is optional, it'd be unclear whether a function application that omits it should be considered fully applied, or partially applied. Imagine writing `let title = display(\"hello!\")`, only to realize `title` isn't your desired result, but a curried call that takes a final optional argument, e.g. `~showDate`.\n\n";
+         "  Formal rule: an optional argument is considered intentionally omitted when the 1st positional (i.e. neither labeled nor optional) argument defined after it is passed in."
+        ]
+#else      
   | Unerasable_optional_argument -> "this optional argument cannot be erased."
+#end  
   | Undeclared_virtual_method m -> "the virtual method "^m^" is not declared."
   | Not_principal s -> s^" is not principal."
   | Without_principality s -> s^" without principality."
@@ -409,10 +431,21 @@ let message = function
       "this statement never returns (or has an unsound type.)"
   | Preprocessor s -> s
   | Useless_record_with ->
+     begin match !Config.syntax_kind with 
+      | `ml ->
       "all the fields are explicitly listed in this record:\n\
        the 'with' clause is useless."
+      | `reason | `rescript ->
+        "All the fields are already explicitly listed in this record. You can remove the `...` spread."
+     end   
+#if true then       
   | Bad_module_name (modname) ->
+    "This file's name is potentially invalid. The build systems conventionally turn a file name into a module name by upper-casing the first letter. " ^ modname ^ " isn't a valid module name.\n" ^
+    "Note: some build systems might e.g. turn kebab-case into CamelCase module, which is why this isn't a hard error."
+#else
+  | Bad_module_name (modname) ->  
       "bad source file name: \"" ^ modname ^ "\" is not a valid module name."
+#end      
   | All_clauses_guarded ->
       "this pattern-matching is not exhaustive.\n\
        All clauses in this pattern-matching are guarded."
@@ -616,17 +649,7 @@ let report w =
              }
 ;;
 
-#if true then
-let super_report message w =
-  match is_active w with
-  | false -> `Inactive
-  | true ->
-     if is_error w then incr nerrors;
-     `Active { number = number w; message = message w; is_error = is_error w;
-               sub_locs = sub_locs w;
-             }
-;;    
-#end
+
 exception Errors;;
 
 let reset_fatal () =
